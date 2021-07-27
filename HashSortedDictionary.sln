@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashSortedDictionary", "Has
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashSortedDictionary.Tests", "HashSortedDictionary.Tests\HashSortedDictionary.Tests.csproj", "{EA219FCA-902E-4E59-83B7-9B72A94BD724}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HashSortedDictionary.Benchmarks", "HashSortedDictionary.Benchmarks\HashSortedDictionary.Benchmarks.csproj", "{A1E13227-21FF-458C-B0A0-FDEE0132114F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +25,9 @@ Global
 		{EA219FCA-902E-4E59-83B7-9B72A94BD724}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA219FCA-902E-4E59-83B7-9B72A94BD724}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA219FCA-902E-4E59-83B7-9B72A94BD724}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1E13227-21FF-458C-B0A0-FDEE0132114F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1E13227-21FF-458C-B0A0-FDEE0132114F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1E13227-21FF-458C-B0A0-FDEE0132114F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1E13227-21FF-458C-B0A0-FDEE0132114F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
