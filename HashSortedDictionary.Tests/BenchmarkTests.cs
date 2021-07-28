@@ -9,8 +9,8 @@ namespace HashSortedDictionary.Tests
         [TestMethod]
         public void Test_Benchmark()
         {
-            var bench = new QueueBenchmarks {Size = 100, KeyRange = 100_000};
-            bench.Enqueue_Dequeue_Benchmark(BenchmarkingQueueType.HashSorted, 256);
+            var bench = new QueueBenchmarks {Size = 100, KeyRange = 1000};
+            bench.Enqueue_Dequeue_Benchmark(BenchmarkingQueueType.HashSorted, 2);
         }
     }
 }

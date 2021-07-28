@@ -10,17 +10,18 @@ namespace HashSortedDictionary
         private static readonly IComparer<TKey> KeyComparer = Comparer<TKey>.Default;
         
         private readonly Func<TKey, int> _sortedHash;
-        private readonly int _bucketSize;
+        private readonly byte _bucketSizeBits;
         private IHierarchicalBucket? _root;
         private long _firstHash;
         private long _capacity;
+        private byte _capacityBits;
 
         public int Count { get; private set; }
 
-        public HashSortedDictionary(Func<TKey, int> sortedHash, int bucketSize)
+        public HashSortedDictionary(Func<TKey, int> sortedHash, byte bucketSizeBits)
         {
             _sortedHash = sortedHash ?? throw new ArgumentNullException(nameof(sortedHash));
-            _bucketSize = bucketSize;
+            _bucketSizeBits = bucketSizeBits;
         }
 
         public bool TryAdd(TKey key, TValue value)
@@ -28,24 +29,27 @@ namespace HashSortedDictionary
             var hash = _sortedHash(key);
             if (_root == null)
             {
-                _root = new LeafBucket(_bucketSize);
-                _capacity = _bucketSize;
+                _root = new LeafBucket(_bucketSizeBits);
+                _capacityBits = _bucketSizeBits;
+                _capacity = 1L << _capacityBits;
                 _firstHash = hash;
             }
             else
             {
                 while (hash >= _firstHash + _capacity)
                 {
-                    _capacity *= _bucketSize;
-                    _root = new BranchBucket(_bucketSize, _root.Level + 1, _capacity, _root);
+                    _capacityBits += _bucketSizeBits;
+                    _capacity = 1L << _capacityBits;
+                    _root = new BranchBucket(_bucketSizeBits, _root.Level + 1, _capacityBits, _root);
                 }
 
                 while (hash < _firstHash)
                 {
                     _firstHash += _capacity;
-                    _capacity *= _bucketSize;
+                    _capacityBits += _bucketSizeBits;
+                    _capacity = 1L << _capacityBits;
                     _firstHash -= _capacity;
-                    _root = new BranchBucket(_bucketSize, _root.Level + 1, _capacity, null, _root);
+                    _root = new BranchBucket(_bucketSizeBits, _root.Level + 1, _capacityBits, null, _root);
                 }
             }
             if (!_root.TryAdd(hash - _firstHash, key, value))
@@ -64,14 +68,16 @@ namespace HashSortedDictionary
                     if (_root.BucketCount == 0)
                     {
                         _root = null;
+                        _capacityBits = 0;
                         _capacity = 0;
                     }
                     else
                         while (_root!.BucketCount == 1 && _root.Level > 0)
                         {
                             _root.TryGetFirstBucket(out _root, out var entryIndex);
-                            _capacity /= _bucketSize;
-                            _firstHash += _capacity * entryIndex;
+                            _capacityBits -= _bucketSizeBits;
+                            _capacity = 1L << _capacityBits;
+                            _firstHash += (long)entryIndex << _capacityBits;
                         }
                     --Count;
                     return true;
@@ -117,13 +123,13 @@ namespace HashSortedDictionary
 
         private class Bucket<TEntry> where TEntry : class
         {
-            protected readonly int BucketSize;
             protected readonly TEntry?[] Entries;
+            protected readonly byte BucketSizeBits;
 
-            protected Bucket(int bucketSize)
+            protected Bucket(byte bucketSizeBits)
             {
-                BucketSize = bucketSize;
-                Entries = new TEntry?[bucketSize];
+                BucketSizeBits = bucketSizeBits;
+                Entries = new TEntry?[1 << bucketSizeBits];
             }
         }
 
@@ -146,7 +152,7 @@ namespace HashSortedDictionary
             public int Level => 0;
             public int BucketCount { get; private set; }
             
-            public LeafBucket(int bucketSize) : base(bucketSize)
+            public LeafBucket(byte bucketSizeBits) : base(bucketSizeBits)
             {
             }
 
@@ -242,15 +248,18 @@ namespace HashSortedDictionary
 
         private class BranchBucket : Bucket<IHierarchicalBucket>, IHierarchicalBucket
         {
-            private readonly long _entryCapacity;
+            private readonly byte _entryCapacityBits;
+            private readonly long _entryIndexMask;
+            
             public int Level { get; }
             public int BucketCount { get; private set; }
 
-            public BranchBucket(int bucketSize, int level, long capacity, IHierarchicalBucket? firstChild = null, IHierarchicalBucket? lastChild = null)
-                : base(bucketSize)
+            public BranchBucket(byte bucketSizeBits, int level, byte capacityBits, IHierarchicalBucket? firstChild = null, IHierarchicalBucket? lastChild = null)
+                : base(bucketSizeBits)
             {
                 Level = level;
-                _entryCapacity = capacity / BucketSize;
+                _entryCapacityBits = (byte)(capacityBits - BucketSizeBits);
+                _entryIndexMask = (1L << _entryCapacityBits) - 1L;
                 Entries[0] = firstChild;
                 Entries[^1] = lastChild;
                 BucketCount = (firstChild == null ? 0 : 1) + (lastChild == null ? 0 : 1);
@@ -258,32 +267,32 @@ namespace HashSortedDictionary
 
             public bool TryAdd(long index, TKey key, TValue value)
             {
-                var entryIndex = index / _entryCapacity;
+                var entryIndex = index >> _entryCapacityBits;
                 var entry = Entries[entryIndex];
                 if (entry == null)
                 {
-                    entry = Level == 0 ? new LeafBucket(BucketSize) : new BranchBucket(BucketSize, Level - 1, _entryCapacity);
+                    entry = Level == 1 ? new LeafBucket(BucketSizeBits) : new BranchBucket(BucketSizeBits, Level - 1, _entryCapacityBits);
                     Entries[entryIndex] = entry;
                     ++BucketCount;
                 }
 
-                return entry.TryAdd(index % _entryCapacity, key, value);
+                return entry.TryAdd(index & _entryIndexMask, key, value);
             }
 
             public bool TryGet(long index, TKey key, [NotNullWhen(true)] out TValue? value)
             {
-                var entry = Entries[index / _entryCapacity];
+                var entry = Entries[index >> _entryCapacityBits];
                 if (entry != null)
-                    return entry.TryGet(index % _entryCapacity, key, out value);
+                    return entry.TryGet(index & _entryIndexMask, key, out value);
                 value = default;
                 return false;
             }
 
             public bool TryRemove(long index, TKey key, [NotNullWhen(true)] out TValue? value)
             {
-                var entryIndex = index / _entryCapacity;
+                var entryIndex = index >> _entryCapacityBits;
                 var entry = Entries[entryIndex];
-                if (entry != null && entry.TryRemove(index % _entryCapacity, key, out value))
+                if (entry != null && entry.TryRemove(index & _entryIndexMask, key, out value))
                 {
                     if (entry.BucketCount == 0)
                     {

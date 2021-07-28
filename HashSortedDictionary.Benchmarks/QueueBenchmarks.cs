@@ -16,15 +16,15 @@ namespace HashSortedDictionary.Benchmarks
 
         [Benchmark]
         [Arguments(BenchmarkingQueueType.Sorted, 0)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 4)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 32)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 256)]
-        public void Enqueue_Dequeue_Benchmark(BenchmarkingQueueType type, int bucketSize)
+        [Arguments(BenchmarkingQueueType.HashSorted, 2)]
+        [Arguments(BenchmarkingQueueType.HashSorted, 5)]
+        [Arguments(BenchmarkingQueueType.HashSorted, 8)]
+        public void Enqueue_Dequeue_Benchmark(BenchmarkingQueueType type, int bucketSizeBits)
         {
             IBenchmarkingQueue<int> queue = type switch
             {
                 BenchmarkingQueueType.Sorted => new SortedBenchmarkingQueue<int>(),
-                BenchmarkingQueueType.HashSorted => new HashSortedBenchmarkingQueue<int>(k => k, bucketSize),
+                BenchmarkingQueueType.HashSorted => new HashSortedBenchmarkingQueue<int>(k => k, (byte)bucketSizeBits),
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
             };
 

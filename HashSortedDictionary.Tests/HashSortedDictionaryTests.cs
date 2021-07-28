@@ -13,27 +13,13 @@ namespace HashSortedDictionary.Tests
 
         private static int TestHash(int key) => key / 100;
 
-        protected static IEnumerable<object[]> Test_Bucket_Sizes() => new[]
-        {
-            new object[] {2},
-            new object[] {3},
-            new object[] {4},
-            new object[] {7},
-            new object[] {10},
-            new object[] {11},
-            new object[] {16},
-            new object[] {32},
-            new object[] {128},
-            new object[] {256},
-            new object[] {1000},
-            new object[] {1001}
-        };
+        protected static IEnumerable<object[]> Test_Bucket_Sizes() => new byte[] {1, 2, 3, 4, 5, 7, 8, 10, 11}.Select(bsb => new object[] {bsb});
 
         [TestMethod]
         [DynamicData(nameof(Test_Bucket_Sizes), DynamicDataSourceType.Method)]
-        public void HashSortedDictionary_Add_Remove_Test(int bucketSize)
+        public void HashSortedDictionary_Add_Remove_Test(byte bucketSizeBits)
         {
-            var dict = new HashSortedDictionary<int, int>(TestHash, bucketSize);
+            var dict = new HashSortedDictionary<int, int>(TestHash, bucketSizeBits);
             Assert.AreEqual(0, dict.Count);
             var rnd = new Random(24);
             var testKeys = Enumerable.Range(0, TestItemCount * 10)
@@ -64,9 +50,9 @@ namespace HashSortedDictionary.Tests
 
         [TestMethod]
         [DynamicData(nameof(Test_Bucket_Sizes), DynamicDataSourceType.Method)]
-        public void HashSortedDictionary_GetFirst_Test(int bucketSize)
+        public void HashSortedDictionary_GetFirst_Test(byte bucketSizeBits)
         {
-            var dict = new HashSortedDictionary<int, int>(TestHash, bucketSize);
+            var dict = new HashSortedDictionary<int, int>(TestHash, bucketSizeBits);
             Assert.AreEqual(0, dict.Count);
             var rnd = new Random(24);
             var testKeys = Enumerable.Range(0, TestItemCount * 10)
