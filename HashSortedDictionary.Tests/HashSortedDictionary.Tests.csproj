@@ -9,6 +9,7 @@
         <PackageReference Include="coverlet.collector" Version="3.1.0" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\HashSortedDictionary.Benchmarks\HashSortedDictionary.Benchmarks.csproj" />
       <ProjectReference Include="..\HashSortedDictionary\HashSortedDictionary.csproj" />
     </ItemGroup>
 </Project>

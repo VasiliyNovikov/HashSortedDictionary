@@ -8,7 +8,10 @@ namespace HashSortedDictionary.Tests
     [TestClass]
     public class HashSortedDictionaryTests
     {
+        private const int TestKeyRange = 100_000;
         private const int TestItemCount = 10_000;
+
+        private static int TestHash(int key) => key / 100;
 
         protected static IEnumerable<object[]> Test_Bucket_Sizes() => new[]
         {
@@ -21,6 +24,7 @@ namespace HashSortedDictionary.Tests
             new object[] {16},
             new object[] {32},
             new object[] {128},
+            new object[] {256},
             new object[] {1000},
             new object[] {1001}
         };
@@ -29,11 +33,11 @@ namespace HashSortedDictionary.Tests
         [DynamicData(nameof(Test_Bucket_Sizes), DynamicDataSourceType.Method)]
         public void HashSortedDictionary_Add_Remove_Test(int bucketSize)
         {
-            var dict = new HashSortedDictionary<int, int>(k => k, bucketSize);
+            var dict = new HashSortedDictionary<int, int>(TestHash, bucketSize);
             Assert.AreEqual(0, dict.Count);
             var rnd = new Random(24);
             var testKeys = Enumerable.Range(0, TestItemCount * 10)
-                                     .Select(_ => rnd.Next(100_000))
+                                     .Select(_ => rnd.Next(TestKeyRange))
                                      .Distinct()
                                      .Take(TestItemCount)
                                      .ToList();
@@ -62,11 +66,11 @@ namespace HashSortedDictionary.Tests
         [DynamicData(nameof(Test_Bucket_Sizes), DynamicDataSourceType.Method)]
         public void HashSortedDictionary_GetFirst_Test(int bucketSize)
         {
-            var dict = new HashSortedDictionary<int, int>(k => k, bucketSize);
+            var dict = new HashSortedDictionary<int, int>(TestHash, bucketSize);
             Assert.AreEqual(0, dict.Count);
             var rnd = new Random(24);
             var testKeys = Enumerable.Range(0, TestItemCount * 10)
-                .Select(_ => rnd.Next(100_000))
+                .Select(_ => rnd.Next(TestKeyRange))
                 .Distinct()
                 .Take(TestItemCount)
                 .ToList();

@@ -3,22 +3,22 @@ using BenchmarkDotNet.Attributes;
 
 namespace HashSortedDictionary.Benchmarks
 {
+    [MemoryDiagnoser]
     public class QueueBenchmarks
     {
-        [Params(1000, 10000, 100000)]
+        //public static readonly IEnumerable<int> BucketSizes = new[] {4, 16, 64, 256}; 
+        
+        [Params(1000, 100000)]
         public int KeyRange { get; set; }
         
-        [Params(10, 100, 1000, 10000)]
+        [Params(100, 10000)]
         public int Size { get; set; }
 
         [Benchmark]
         [Arguments(BenchmarkingQueueType.Sorted, 0)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 2)]
         [Arguments(BenchmarkingQueueType.HashSorted, 4)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 7)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 8)]
-        [Arguments(BenchmarkingQueueType.HashSorted, 16)]
         [Arguments(BenchmarkingQueueType.HashSorted, 32)]
+        [Arguments(BenchmarkingQueueType.HashSorted, 256)]
         public void Enqueue_Dequeue_Benchmark(BenchmarkingQueueType type, int bucketSize)
         {
             IBenchmarkingQueue<int> queue = type switch

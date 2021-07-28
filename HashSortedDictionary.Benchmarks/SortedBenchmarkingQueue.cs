@@ -11,10 +11,10 @@ namespace HashSortedDictionary.Benchmarks
         public T Dequeue()
         {
             T key;
-            using (var keysEnumerator = _implementation.Keys.GetEnumerator())
+            using (var enumerator = _implementation.GetEnumerator())
             {
-                keysEnumerator.MoveNext();
-                key = keysEnumerator.Current;
+                enumerator.MoveNext();
+                key = enumerator.Current.Key;
             }
             _implementation.Remove(key!);
             return key;

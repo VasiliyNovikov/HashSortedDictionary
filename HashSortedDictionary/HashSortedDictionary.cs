@@ -12,8 +12,8 @@ namespace HashSortedDictionary
         private readonly Func<TKey, int> _sortedHash;
         private readonly int _bucketSize;
         private IHierarchicalBucket? _root;
-        private int _firstHash;
-        private int _capacity;
+        private long _firstHash;
+        private long _capacity;
 
         public int Count { get; private set; }
 
@@ -48,12 +48,10 @@ namespace HashSortedDictionary
                     _root = new BranchBucket(_bucketSize, _root.Level + 1, _capacity, null, _root);
                 }
             }
- 
             if (!_root.TryAdd(hash - _firstHash, key, value))
                 return false;
             ++Count;
             return true;
-
         }
 
         public bool TryRemove(TKey key, [NotNullWhen(true)]out TValue? value)
@@ -110,9 +108,9 @@ namespace HashSortedDictionary
             int Level { get; }
             int BucketCount { get; }
 
-            bool TryAdd(int index, TKey key, TValue value);
-            bool TryGet(int index, TKey key, [NotNullWhen(true)] out TValue? value);
-            bool TryRemove(int index, TKey key, [NotNullWhen(true)] out TValue? value);
+            bool TryAdd(long index, TKey key, TValue value);
+            bool TryGet(long index, TKey key, [NotNullWhen(true)] out TValue? value);
+            bool TryRemove(long index, TKey key, [NotNullWhen(true)] out TValue? value);
             bool TryGetFirstBucket([NotNullWhen(true)] out IHierarchicalBucket? bucket, out int bucketIndex);
             bool TryGetFirst([NotNullWhen(true)] out TKey? key, [NotNullWhen(true)] out TValue? value);
         }
@@ -129,7 +127,21 @@ namespace HashSortedDictionary
             }
         }
 
-        private class LeafBucket : Bucket<List<KeyValuePair<TKey, TValue>>>, IHierarchicalBucket
+        private class LeafEntry
+        {
+            public TKey Key { get; }
+            public TValue Value { get; }
+            public LeafEntry? Next { get; set; }
+
+            public LeafEntry(TKey key, TValue value, LeafEntry? next)
+            {
+                Key = key;
+                Value = value;
+                Next = next;
+            }
+        }
+
+        private class LeafBucket : Bucket<LeafEntry>, IHierarchicalBucket
         {
             public int Level => 0;
             public int BucketCount { get; private set; }
@@ -138,51 +150,56 @@ namespace HashSortedDictionary
             {
             }
 
-            public bool TryAdd(int index, TKey key, TValue value)
+            public bool TryAdd(long index, TKey key, TValue value)
             {
-                var entry = Entries[index];
-                if (entry == null)
-                    Entries[index] = entry = new List<KeyValuePair<TKey, TValue>>();
-                else
-                    foreach (var keyValuePair in entry)
-                        if (KeyComparer.Compare(key, keyValuePair.Key) == 0)
-                            return false;
-                entry.Add(new(key, value));
+                var firstEntry = Entries[index];
+                var entry = firstEntry;
+                while (entry != null)
+                {
+                    if (KeyComparer.Compare(key, entry.Key) == 0)
+                        return false;
+                    entry = entry.Next;
+                }
+                Entries[index] = new LeafEntry(key, value, firstEntry);
                 ++BucketCount;
                 return true;
             }
 
-            public bool TryGet(int index, TKey key, [NotNullWhen(true)] out TValue? value)
+            public bool TryGet(long index, TKey key, [NotNullWhen(true)] out TValue? value)
             {
                 var entry = Entries[index];
-                if (entry != null)
-                    foreach (var keyValuePair in entry)
-                        if (KeyComparer.Compare(key, keyValuePair.Key) == 0)
-                        {
-                            value = keyValuePair.Value!;
-                            return true;
-                        }
+                while (entry != null)
+                {
+                    if (KeyComparer.Compare(key, entry.Key) == 0)
+                    {
+                        value = entry.Value!;
+                        return true;
+                    }
+                    entry = entry.Next;
+                }
                 value = default;
                 return false;
             }
 
-            public bool TryRemove(int index, TKey key, [NotNullWhen(true)] out TValue? value)
+            public bool TryRemove(long index, TKey key, [NotNullWhen(true)] out TValue? value)
             {
                 var entry = Entries[index];
-                if (entry != null)
-                    for (var i = 0; i < entry.Count; i++)
+                LeafEntry? prevEntry = null;
+                while (entry != null)
+                {
+                    if (KeyComparer.Compare(key, entry.Key) == 0)
                     {
-                        var keyValuePair = entry[i];
-                        if (KeyComparer.Compare(key, keyValuePair.Key) == 0)
-                        {
-                            value = keyValuePair.Value!;
-                            entry.RemoveAt(i);
-                            if (entry.Count == 0)
-                                Entries[index] = null;
-                            --BucketCount;
-                            return true;
-                        }
+                        value = entry.Value!;
+                        if (prevEntry == null) 
+                            Entries[index] = entry.Next;
+                        else
+                            prevEntry.Next = entry.Next;
+                        --BucketCount;
+                        return true;
                     }
+                    prevEntry = entry;
+                    entry = entry.Next;
+                }
                 value = default;
                 return false;
             }
@@ -197,17 +214,26 @@ namespace HashSortedDictionary
             public bool TryGetFirst([NotNullWhen(true)] out TKey? key, [NotNullWhen(true)] out TValue? value)
             {
                 if (BucketCount != 0)
-                {
-                    foreach (var entry in Entries)
-                        if (entry != null)
-                        {
-                            var pair = entry[0];
-                            key = pair.Key!;
-                            value = pair.Value!;
-                            return true;
-                        }
-                }
+                    foreach (var firstEntry in Entries)
+                    {
+                        if (firstEntry == null)
+                            continue;
 
+                        var entry = firstEntry;
+                        key = entry.Key!;
+                        value = entry.Value!;
+                        entry = entry.Next;
+                        while (entry != null)
+                        {
+                            if (KeyComparer.Compare(entry.Key, key) < 0)
+                            {
+                                key = entry.Key!;
+                                value = entry.Value!;
+                            }
+                            entry = entry.Next;
+                        }
+                        return true;
+                    }
                 key = default;
                 value = default;
                 return false;
@@ -216,11 +242,11 @@ namespace HashSortedDictionary
 
         private class BranchBucket : Bucket<IHierarchicalBucket>, IHierarchicalBucket
         {
-            private readonly int _entryCapacity;
+            private readonly long _entryCapacity;
             public int Level { get; }
             public int BucketCount { get; private set; }
 
-            public BranchBucket(int bucketSize, int level, int capacity, IHierarchicalBucket? firstChild = null, IHierarchicalBucket? lastChild = null)
+            public BranchBucket(int bucketSize, int level, long capacity, IHierarchicalBucket? firstChild = null, IHierarchicalBucket? lastChild = null)
                 : base(bucketSize)
             {
                 Level = level;
@@ -230,7 +256,7 @@ namespace HashSortedDictionary
                 BucketCount = (firstChild == null ? 0 : 1) + (lastChild == null ? 0 : 1);
             }
 
-            public bool TryAdd(int index, TKey key, TValue value)
+            public bool TryAdd(long index, TKey key, TValue value)
             {
                 var entryIndex = index / _entryCapacity;
                 var entry = Entries[entryIndex];
@@ -244,7 +270,7 @@ namespace HashSortedDictionary
                 return entry.TryAdd(index % _entryCapacity, key, value);
             }
 
-            public bool TryGet(int index, TKey key, [NotNullWhen(true)] out TValue? value)
+            public bool TryGet(long index, TKey key, [NotNullWhen(true)] out TValue? value)
             {
                 var entry = Entries[index / _entryCapacity];
                 if (entry != null)
@@ -253,7 +279,7 @@ namespace HashSortedDictionary
                 return false;
             }
 
-            public bool TryRemove(int index, TKey key, [NotNullWhen(true)] out TValue? value)
+            public bool TryRemove(long index, TKey key, [NotNullWhen(true)] out TValue? value)
             {
                 var entryIndex = index / _entryCapacity;
                 var entry = Entries[entryIndex];
