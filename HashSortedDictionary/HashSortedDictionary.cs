@@ -32,24 +32,17 @@ namespace HashSortedDictionary
                 _root = new LeafBucket(_bucketSizeBits);
                 _capacityBits = _bucketSizeBits;
                 _capacity = 1L << _capacityBits;
-                _firstHash = hash;
+                _firstHash = (hash >> _capacityBits) << _capacityBits;
             }
             else
             {
-                while (hash >= _firstHash + _capacity)
+                while (hash >= _firstHash + _capacity || hash < _firstHash)
                 {
                     _capacityBits += _bucketSizeBits;
                     _capacity = 1L << _capacityBits;
-                    _root = new BranchBucket(_bucketSizeBits, _root.Level + 1, _capacityBits, _root);
-                }
-
-                while (hash < _firstHash)
-                {
-                    _firstHash += _capacity;
-                    _capacityBits += _bucketSizeBits;
-                    _capacity = 1L << _capacityBits;
-                    _firstHash -= _capacity;
-                    _root = new BranchBucket(_bucketSizeBits, _root.Level + 1, _capacityBits, null, _root);
+                    var prevFirstHash = _firstHash;
+                    _firstHash = (prevFirstHash >> _capacityBits) << _capacityBits;
+                    _root = new BranchBucket(_bucketSizeBits, _root.Level + 1, _capacityBits, _root, prevFirstHash - _firstHash);
                 }
             }
             if (!_root.TryAdd(hash - _firstHash, key, value))
@@ -254,15 +247,16 @@ namespace HashSortedDictionary
             public int Level { get; }
             public int BucketCount { get; private set; }
 
-            public BranchBucket(byte bucketSizeBits, int level, byte capacityBits, IHierarchicalBucket? firstChild = null, IHierarchicalBucket? lastChild = null)
+            public BranchBucket(byte bucketSizeBits, int level, byte capacityBits, IHierarchicalBucket? child = null, long childIndex = 0)
                 : base(bucketSizeBits)
             {
                 Level = level;
                 _entryCapacityBits = (byte)(capacityBits - BucketSizeBits);
                 _entryIndexMask = (1L << _entryCapacityBits) - 1L;
-                Entries[0] = firstChild;
-                Entries[^1] = lastChild;
-                BucketCount = (firstChild == null ? 0 : 1) + (lastChild == null ? 0 : 1);
+                if (child == null)
+                    return;
+                Entries[childIndex >> _entryCapacityBits] = child;
+                BucketCount = 1;
             }
 
             public bool TryAdd(long index, TKey key, TValue value)
