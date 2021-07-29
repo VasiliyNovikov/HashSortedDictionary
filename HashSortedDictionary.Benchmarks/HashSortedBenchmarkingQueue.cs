@@ -6,7 +6,7 @@ namespace HashSortedDictionary.Benchmarks
     {
         private readonly HashSortedDictionary<T, bool> _implementation;
 
-        public HashSortedBenchmarkingQueue(Func<T, int> sortedHash, byte bucketSizeBits) => _implementation = new(sortedHash, bucketSizeBits);
+        public HashSortedBenchmarkingQueue(Func<T, uint> sortedHash, byte bucketSizeBits) => _implementation = new(sortedHash, bucketSizeBits);
 
         public void Enqueue(T key) => _implementation.TryAdd(key, false);
 

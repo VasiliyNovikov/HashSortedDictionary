@@ -8,12 +8,12 @@ namespace HashSortedDictionary.Tests
     [TestClass]
     public class HashSortedDictionaryTests
     {
-        private const int TestKeyRange = 100_000;
-        private const int TestItemCount = 10_000;
+        private const int TestKeyRange = 100_000_000;
+        private const int TestItemCount = 100_000;
 
-        private static int TestHash(int key) => key / 100;
+        private static uint TestHash(int key) => (uint)key / 10;
 
-        protected static IEnumerable<object[]> Test_Bucket_Sizes() => new byte[] {1, 2, 3, 4, 5, 7, 8, 10, 11}.Select(bsb => new object[] {bsb});
+        protected static IEnumerable<object[]> Test_Bucket_Sizes() => new byte[] {1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17}.Select(bsb => new object[] {bsb});
 
         [TestMethod]
         [DynamicData(nameof(Test_Bucket_Sizes), DynamicDataSourceType.Method)]
@@ -56,10 +56,10 @@ namespace HashSortedDictionary.Tests
             Assert.AreEqual(0, dict.Count);
             var rnd = new Random(24);
             var testKeys = Enumerable.Range(0, TestItemCount * 10)
-                .Select(_ => rnd.Next(TestKeyRange))
-                .Distinct()
-                .Take(TestItemCount)
-                .ToList();
+                                     .Select(_ => rnd.Next(TestKeyRange))
+                                     .Distinct()
+                                     .Take(TestItemCount)
+                                     .ToList();
 
             foreach (var key in testKeys) 
                 Assert.IsTrue(dict.TryAdd(key, key + 42));
