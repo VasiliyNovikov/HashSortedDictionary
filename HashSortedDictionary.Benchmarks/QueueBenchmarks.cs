@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 
 namespace HashSortedDictionary.Benchmarks
 {
     [MemoryDiagnoser]
+    [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByMethod)]
     public class QueueBenchmarks
     {
         public static IEnumerable<object[]> Queues() => new[]

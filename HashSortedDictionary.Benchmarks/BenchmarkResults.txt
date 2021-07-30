@@ -1,22 +1,43 @@
-|                    Method | KeyRange |  Size |       type | bucketSizeBits |         Mean |       Error |      StdDev |      Gen 0 |     Gen 1 |    Gen 2 |  Allocated |
-|-------------------------- |--------- |------ |----------- |--------------- |-------------:|------------:|------------:|-----------:|----------:|---------:|-----------:|
-| Enqueue_Dequeue_Benchmark |     1000 |   100 |     Sorted |              ? |     577.3 us |    10.52 us |    11.26 us |     5.8594 |         - |        - |     379 KB |
-| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              2 |     609.4 us |     7.65 us |     6.78 us |    13.6719 |         - |        - |     908 KB |
-| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              4 |     427.5 us |     3.88 us |     3.24 us |    14.1602 |         - |        - |     912 KB |
-| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              6 |     406.6 us |     5.16 us |     4.58 us |    22.9492 |         - |        - |   1,512 KB |
-| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              8 |     772.5 us |    11.05 us |    10.34 us |    87.8906 |    1.9531 |        - |   5,692 KB |
-| Enqueue_Dequeue_Benchmark |     1000 | 10000 |     Sorted |              ? |  24,110.0 us |   288.50 us |   255.75 us |   406.2500 |         - |        - |  27,007 KB |
-| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              2 |  19,840.1 us |   147.24 us |   130.53 us |   437.5000 |         - |        - |  28,787 KB |
-| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              4 |  21,471.3 us |   322.02 us |   301.21 us |   718.7500 |         - |        - |  46,578 KB |
-| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              6 |  29,448.3 us |   427.33 us |   399.72 us |  1843.7500 |         - |        - | 121,200 KB |
-| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              8 |  58,043.3 us |   798.64 us |   747.05 us |  6555.5556 |         - |        - | 424,937 KB |
-| Enqueue_Dequeue_Benchmark |   100000 |   100 |     Sorted |              ? |     712.0 us |     8.17 us |     7.24 us |     6.8359 |         - |        - |     427 KB |
-| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              2 |     981.3 us |     8.30 us |     6.93 us |    23.4375 |    1.9531 |        - |   1,504 KB |
-| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              4 |     663.1 us |     8.58 us |     7.16 us |    25.3906 |    2.9297 |        - |   1,564 KB |
-| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              6 |     562.3 us |    11.16 us |    10.44 us |    36.1328 |    5.8594 |        - |   2,128 KB |
-| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              8 |   1,251.5 us |     9.83 us |     8.72 us |   156.2500 |   35.1563 |        - |   8,823 KB |
-| Enqueue_Dequeue_Benchmark |   100000 | 10000 |     Sorted |              ? | 115,389.1 us | 1,687.17 us | 1,408.86 us |  1200.0000 |  400.0000 |        - |  58,772 KB |
-| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              2 | 108,197.8 us | 1,837.84 us | 1,719.12 us |  2800.0000 | 1000.0000 | 200.0000 | 146,245 KB |
-| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              4 |  70,187.6 us |   548.14 us |   427.95 us |  2857.1429 |  857.1429 | 142.8571 | 153,035 KB |
-| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              6 |  60,661.9 us |   587.50 us |   490.59 us |  4125.0000 | 1625.0000 | 250.0000 | 209,250 KB |
-| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              8 | 126,960.1 us | 1,439.81 us | 1,202.30 us | 14250.0000 | 1500.0000 | 250.0000 | 867,354 KB |
+|                    Method | KeyRange |  Size |       type | bucketSizeBits |           Mean |         Error |        StdDev |      Gen 0 |     Gen 1 |    Gen 2 |  Allocated |
+|-------------------------- |--------- |------ |----------- |--------------- |---------------:|--------------:|--------------:|-----------:|----------:|---------:|-----------:|
+| Enqueue_Dequeue_Benchmark |     1000 |   100 |     Sorted |              ? |     564.095 us |     6.7536 us |     5.9869 us |     5.8594 |         - |        - |     379 KB |
+| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              2 |     599.763 us |     5.5951 us |     4.6722 us |    13.6719 |         - |        - |     908 KB |
+| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              4 |     430.742 us |     7.8918 us |     7.3820 us |    14.1602 |         - |        - |     912 KB |
+| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              6 |     407.908 us |     7.1495 us |     6.3378 us |    22.9492 |         - |        - |   1,512 KB |
+| Enqueue_Dequeue_Benchmark |     1000 |   100 | HashSorted |              8 |     781.162 us |    12.1359 us |    11.3520 us |    87.8906 |    1.9531 |        - |   5,692 KB |
+| Enqueue_Dequeue_Benchmark |     1000 | 10000 |     Sorted |              ? |  22,800.494 us |   199.5667 us |   166.6472 us |   406.2500 |         - |        - |  27,007 KB |
+| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              2 |  20,488.249 us |   278.1541 us |   260.1855 us |   437.5000 |         - |        - |  28,787 KB |
+| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              4 |  21,492.111 us |   209.9237 us |   175.2958 us |   718.7500 |         - |        - |  46,578 KB |
+| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              6 |  29,941.475 us |    53.0865 us |    41.4464 us |  1843.7500 |         - |        - | 121,200 KB |
+| Enqueue_Dequeue_Benchmark |     1000 | 10000 | HashSorted |              8 |  58,715.479 us |   624.5941 us |   553.6864 us |  6555.5556 |         - |        - | 424,936 KB |
+| Enqueue_Dequeue_Benchmark |   100000 |   100 |     Sorted |              ? |     711.540 us |    11.9492 us |    11.1773 us |     6.8359 |         - |        - |     427 KB |
+| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              2 |   1,034.363 us |    17.3455 us |    17.0356 us |    23.4375 |    1.9531 |        - |   1,504 KB |
+| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              4 |     665.462 us |    11.8723 us |    11.1053 us |    25.3906 |    2.9297 |        - |   1,564 KB |
+| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              6 |     548.610 us |     1.4129 us |     1.1798 us |    36.1328 |    5.8594 |        - |   2,128 KB |
+| Enqueue_Dequeue_Benchmark |   100000 |   100 | HashSorted |              8 |   1,303.550 us |    16.2805 us |    14.4323 us |   156.2500 |   35.1563 |        - |   8,823 KB |
+| Enqueue_Dequeue_Benchmark |   100000 | 10000 |     Sorted |              ? | 115,111.641 us | 2,096.9420 us | 1,961.4809 us |  1200.0000 |  400.0000 |        - |  58,774 KB |
+| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              2 | 106,808.886 us | 1,976.0987 us | 1,848.4439 us |  2800.0000 | 1000.0000 | 200.0000 | 146,245 KB |
+| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              4 |  70,813.494 us |   890.4789 us |   832.9545 us |  2875.0000 |  875.0000 | 125.0000 | 153,035 KB |
+| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              6 |  60,335.202 us |   253.6632 us |   198.0435 us |  4222.2222 | 1666.6667 | 222.2222 | 209,248 KB |
+| Enqueue_Dequeue_Benchmark |   100000 | 10000 | HashSorted |              8 | 132,813.227 us |   979.1430 us |   867.9847 us | 14250.0000 | 1500.0000 | 250.0000 | 867,355 KB |
+|                           |          |       |            |                |                |               |               |            |           |          |            |
+|            Fill_Benchmark |     1000 |   100 |     Sorted |              ? |      12.397 us |     0.2367 us |     0.2533 us |     0.0763 |         - |        - |       5 KB |
+|            Fill_Benchmark |     1000 |   100 | HashSorted |              2 |       9.659 us |     0.0974 us |     0.0864 us |     0.2747 |    0.0153 |        - |      17 KB |
+|            Fill_Benchmark |     1000 |   100 | HashSorted |              4 |       6.458 us |     0.1243 us |     0.1162 us |     0.2136 |    0.0076 |        - |      13 KB |
+|            Fill_Benchmark |     1000 |   100 | HashSorted |              6 |       4.834 us |     0.0535 us |     0.0474 us |     0.1907 |    0.0076 |        - |      12 KB |
+|            Fill_Benchmark |     1000 |   100 | HashSorted |              8 |       4.705 us |     0.0799 us |     0.0708 us |     0.2136 |    0.0076 |        - |      14 KB |
+|            Fill_Benchmark |     1000 | 10000 |     Sorted |              ? |   1,327.517 us |    25.7130 us |    25.2536 us |          - |         - |        - |      47 KB |
+|            Fill_Benchmark |     1000 | 10000 | HashSorted |              2 |     387.226 us |     6.1561 us |     5.7584 us |     0.9766 |         - |        - |      63 KB |
+|            Fill_Benchmark |     1000 | 10000 | HashSorted |              4 |     302.232 us |     4.5477 us |     4.2539 us |     0.4883 |         - |        - |      44 KB |
+|            Fill_Benchmark |     1000 | 10000 | HashSorted |              6 |     258.316 us |     0.3618 us |     0.3208 us |     0.4883 |         - |        - |      41 KB |
+|            Fill_Benchmark |     1000 | 10000 | HashSorted |              8 |     265.256 us |     4.3632 us |     4.0813 us |     0.4883 |         - |        - |      42 KB |
+|            Fill_Benchmark |   100000 |   100 |     Sorted |              ? |      12.669 us |     0.2524 us |     0.2479 us |     0.0763 |         - |        - |       5 KB |
+|            Fill_Benchmark |   100000 |   100 | HashSorted |              2 |      20.708 us |     0.2411 us |     0.2137 us |     0.7935 |    0.0916 |        - |      48 KB |
+|            Fill_Benchmark |   100000 |   100 | HashSorted |              4 |      13.609 us |     0.2186 us |     0.2044 us |     0.7324 |    0.0916 |        - |      44 KB |
+|            Fill_Benchmark |   100000 |   100 | HashSorted |              6 |      13.172 us |     0.2100 us |     0.1964 us |     1.2054 |    0.1984 |        - |      72 KB |
+|            Fill_Benchmark |   100000 |   100 | HashSorted |              8 |      22.692 us |     0.2218 us |     0.1966 us |     3.7231 |    1.2512 |        - |     195 KB |
+|            Fill_Benchmark |   100000 | 10000 |     Sorted |              ? |   3,343.380 us |    47.9887 us |    42.5407 us |     7.8125 |         - |        - |     447 KB |
+|            Fill_Benchmark |   100000 | 10000 | HashSorted |              2 |   1,386.691 us |    24.7556 us |    23.1564 us |    37.1094 |   17.5781 |        - |   1,725 KB |
+|            Fill_Benchmark |   100000 | 10000 | HashSorted |              4 |     822.894 us |     8.4166 us |     7.4611 us |    28.3203 |   13.6719 |        - |   1,307 KB |
+|            Fill_Benchmark |   100000 | 10000 | HashSorted |              6 |     559.161 us |     1.7070 us |     1.3327 us |    25.3906 |   12.6953 |        - |   1,190 KB |
+|            Fill_Benchmark |   100000 | 10000 | HashSorted |              8 |     493.049 us |     5.3291 us |     4.4501 us |    23.4375 |   11.7188 |        - |   1,111 KB |
