@@ -43,5 +43,21 @@ namespace HashSortedDictionary.Benchmarks
                 queue.Enqueue(rnd.Next(KeyRange));
             }
         }
+
+        [Benchmark]
+        [ArgumentsSource(nameof(Queues))]
+        public void Fill_Benchmark(BenchmarkingQueueType type, int? bucketSizeBits)
+        {
+            IBenchmarkingQueue<int> queue = type switch
+            {
+                BenchmarkingQueueType.Sorted => new SortedBenchmarkingQueue<int>(),
+                BenchmarkingQueueType.HashSorted => new HashSortedBenchmarkingQueue<int>(k => (uint)k, (byte)bucketSizeBits!.Value),
+                _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            };
+
+            var rnd = new Random(42);
+            for (var i = 0; i < Size; ++i) 
+                queue.Enqueue(rnd.Next(KeyRange));
+        }
     }
 }
