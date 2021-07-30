@@ -35,7 +35,7 @@ namespace HashSortedDictionary
             }
             else
             {
-                while (hash >= _firstHash + _rootLevel!.ActualCapacity || hash < _firstHash)
+                while (hash > _firstHash + _rootLevel!.ActualMaxIndex || hash < _firstHash)
                 {
                     _rootLevel = _rootLevel.Next!;
                     var prevFirstHash = _firstHash;
@@ -57,7 +57,7 @@ namespace HashSortedDictionary
                 if (hash >= _firstHash)
                 {
                     var index = hash - _firstHash;
-                    if (index < _rootLevel!.ActualCapacity && _root.TryRemove(index, key, out value))
+                    if (index <= _rootLevel!.ActualMaxIndex && _root.TryRemove(index, key, out value))
                     {
                         if (_root.BucketCount == 0)
                         {
@@ -88,7 +88,7 @@ namespace HashSortedDictionary
                 if (hash >= _firstHash)
                 {
                     var index = _sortedHash(key) - _firstHash;
-                    if (index < _rootLevel!.ActualCapacity)
+                    if (index <= _rootLevel!.ActualMaxIndex)
                         return _root.TryGet(index, key, out value);
                 }
             }

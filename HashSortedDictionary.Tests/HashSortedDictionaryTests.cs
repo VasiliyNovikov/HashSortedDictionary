@@ -8,8 +8,8 @@ namespace HashSortedDictionary.Tests
     [TestClass]
     public class HashSortedDictionaryTests
     {
-        private const int TestKeyRange = 100_000_000;
-        private const int TestItemCount = 100_000;
+        private const int TestKeyRange = 10_000;
+        private const int TestItemCount = 10_000;
 
         private static uint TestHash(int key) => (uint)key / 10;
 
@@ -71,6 +71,27 @@ namespace HashSortedDictionary.Tests
                 Assert.AreEqual(key + 42, value);
                 Assert.IsTrue(dict.TryRemove(key, out value));
             }
+
+            Assert.AreEqual(0, dict.Count);
+        }
+
+        [TestMethod]
+        [DynamicData(nameof(Test_Bucket_Sizes), DynamicDataSourceType.Method)]
+        public void HashSortedDictionary_Fill_Hash_Range_Test(byte bucketSizeBits)
+        {
+            var dict = new HashSortedDictionary<uint, uint>(k => k, bucketSizeBits);
+            Assert.IsTrue(dict.TryAdd(0, 0));
+            Assert.IsTrue(dict.TryAdd(uint.MaxValue, uint.MaxValue));
+
+            Assert.IsTrue(dict.TryGet(0, out var value));
+            Assert.AreEqual(0u, value);
+            Assert.IsTrue(dict.TryGet(uint.MaxValue, out value));
+            Assert.AreEqual(uint.MaxValue, value);
+            
+            Assert.IsTrue(dict.TryRemove(0, out value));
+            Assert.AreEqual(0u, value);
+            Assert.IsTrue(dict.TryRemove(uint.MaxValue, out value));
+            Assert.AreEqual(uint.MaxValue, value);
 
             Assert.AreEqual(0, dict.Count);
         }

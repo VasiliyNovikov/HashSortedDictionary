@@ -3,7 +3,7 @@ namespace HashSortedDictionary
     internal static class Constants
     {
         public const byte MaxBucketSizeBits = 26;
-        private const byte MaxCapacityBits = 31;
+        private const byte MaxCapacityBits = 32;
 
         public static readonly BucketLevelInformation[] Levels = GenerateLevels();
 
@@ -23,7 +23,7 @@ namespace HashSortedDictionary
             public byte ActualCapacityBits { get; }
             public byte EntryCapacityBits { get; }
             public uint ActualBucketSize { get; }
-            public uint ActualCapacity { get; }
+            public uint ActualMaxIndex { get; }
             public uint EntryIndexMask { get; }
             public uint HashAlignmentMask { get; }
             
@@ -32,28 +32,32 @@ namespace HashSortedDictionary
 
             public BucketLevelInformation(byte level, byte baseBucketSizeBits, BucketLevelInformation? prev = null)
             {
-                Level = level;
-                BaseBucketSizeBits = baseBucketSizeBits;
-                ActualBucketSizeBits = baseBucketSizeBits;
-                ActualCapacityBits = (byte)(baseBucketSizeBits * (level + 1));
-                if (ActualCapacityBits > MaxCapacityBits)
+                checked
                 {
-                    ActualBucketSizeBits -= (byte)(ActualCapacityBits - MaxCapacityBits); 
-                    ActualCapacityBits = MaxCapacityBits;
+                    Level = level;
+                    BaseBucketSizeBits = baseBucketSizeBits;
+                    ActualBucketSizeBits = baseBucketSizeBits;
+                    ActualCapacityBits = (byte) (baseBucketSizeBits * (level + 1));
+                    if (ActualCapacityBits > MaxCapacityBits)
+                    {
+                        ActualBucketSizeBits -= (byte) (ActualCapacityBits - MaxCapacityBits);
+                        ActualCapacityBits = MaxCapacityBits;
+                    }
+
+                    EntryCapacityBits = (byte) (ActualCapacityBits - ActualBucketSizeBits);
+
+                    ActualBucketSize = 1U << ActualBucketSizeBits;
+                    ActualMaxIndex = (uint) ((1UL << ActualCapacityBits) - 1);
+
+                    EntryIndexMask = (1U << EntryCapacityBits) - 1;
+                    HashAlignmentMask = ~ActualMaxIndex;
+
+                    Prev = prev;
+                    var levelCount = (MaxCapacityBits + baseBucketSizeBits - 1) / baseBucketSizeBits;
+                    var nextLevel = (byte) (level + 1);
+                    if (nextLevel < levelCount)
+                        Next = new BucketLevelInformation(nextLevel, baseBucketSizeBits, this);
                 }
-                EntryCapacityBits = (byte)(ActualCapacityBits - ActualBucketSizeBits);
-
-                ActualBucketSize = 1U << ActualBucketSizeBits;
-                ActualCapacity = 1U << ActualCapacityBits;
-
-                EntryIndexMask = (1U << EntryCapacityBits) - 1;
-                HashAlignmentMask = ~(ActualCapacity - 1);
-
-                Prev = prev;
-                var levelCount = (MaxCapacityBits + baseBucketSizeBits - 1) / baseBucketSizeBits;
-                var nextLevel = (byte)(level + 1);
-                if (nextLevel < levelCount) 
-                    Next = new BucketLevelInformation(nextLevel, baseBucketSizeBits, this);
             }
         }
     }
